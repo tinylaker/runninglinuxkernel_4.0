@@ -46,9 +46,9 @@ struct pinctrl_map_mux {
  * @num_configs: the number of entries in array @configs
  */
 struct pinctrl_map_configs {
-	const char *group_or_pin;
-	unsigned long *configs;
-	unsigned num_configs;
+	const char *group_or_pin;   //该pin或者pin group的名字
+	unsigned long *configs;     //设定值的列表，该值被用来写入寄存器
+	unsigned num_configs;       //列表中值的个数    
 };
 
 /**
@@ -66,10 +66,10 @@ struct pinctrl_map_configs {
  * @data: Data specific to the mapping type
  */
 struct pinctrl_map {
-	const char *dev_name;
-	const char *name;
-	enum pinctrl_map_type type;
-	const char *ctrl_dev_name;
+	const char *dev_name;   //使用这个mapping entry的设备名 
+	const char *name;   //该名字表示了该mapping entry
+	enum pinctrl_map_type type; //这个entry的mapping type 
+	const char *ctrl_dev_name;  //pin controller这个设备的名字
 	union {
 		struct pinctrl_map_mux mux;
 		struct pinctrl_map_configs configs;

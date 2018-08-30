@@ -26,10 +26,10 @@
  * @default_state: the default state for the handle, if found
  */
 struct dev_pin_info {
-	struct pinctrl *p;
-	struct pinctrl_state *default_state;
-#ifdef CONFIG_PM
-	struct pinctrl_state *sleep_state;
+	struct pinctrl *p;  //该device对应的pin control state holder
+	struct pinctrl_state *default_state;    //缺省状态
+#ifdef CONFIG_PM    
+	struct pinctrl_state *sleep_state;      //电源管理的相关状态
 	struct pinctrl_state *idle_state;
 #endif
 };

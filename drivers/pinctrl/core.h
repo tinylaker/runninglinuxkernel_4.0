@@ -64,12 +64,12 @@ struct pinctrl_dev {
  * @users: reference count
  */
 struct pinctrl {
-	struct list_head node;
-	struct device *dev;
-	struct list_head states;
-	struct pinctrl_state *state;
-	struct list_head dt_maps;
-	struct kref users;
+	struct list_head node;  //系统中所有device的pin control state holder被挂入全局链表
+	struct device *dev;     //该pin control state holder对应的device
+	struct list_head states;    //该device的所有状态被挂入这个链表
+	struct pinctrl_state *state;    //该device当前的状态
+	struct list_head dt_maps;   //mapping table
+	struct kref users;  //引用计数
 };
 
 /**
@@ -79,9 +79,9 @@ struct pinctrl {
  * @settings: a list of settings for this state
  */
 struct pinctrl_state {
-	struct list_head node;
-	const char *name;
-	struct list_head settings;
+	struct list_head node;  //挂入链表头的节点
+	const char *name;   //该state的名字
+	struct list_head settings;  //属于该状态所有的setting
 };
 
 /**
@@ -90,8 +90,8 @@ struct pinctrl_state {
  * @func: the function selector to program
  */
 struct pinctrl_setting_mux {
-	unsigned group;
-	unsigned func;
+	unsigned group; //该setting对应的group selector
+	unsigned func;  //该setting对应的function selector
 };
 
 /**

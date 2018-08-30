@@ -119,7 +119,7 @@ static int dt_to_map_one_config(struct pinctrl *p, const char *statename,
 	/* Find the pin controller containing np_config */
 	np_pctldev = of_node_get(np_config);
 	for (;;) {
-		np_pctldev = of_get_next_parent(np_pctldev);
+		np_pctldev = of_get_next_parent(np_pctldev);    //找到pin configuration node对应的parent node，即pin control node
 		if (!np_pctldev || of_node_is_root(np_pctldev)) {
 			dev_info(p->dev, "could not find pctldev for node %s, deferring probe\n",
 				np_config->full_name);
@@ -127,7 +127,7 @@ static int dt_to_map_one_config(struct pinctrl *p, const char *statename,
 			/* OK let's just assume this will appear later then */
 			return -EPROBE_DEFER;
 		}
-		pctldev = get_pinctrl_dev_from_of_node(np_pctldev);
+		pctldev = get_pinctrl_dev_from_of_node(np_pctldev); //获取pin control class device
 		if (pctldev)
 			break;
 		/* Do not defer probing of hogs (circular loop) */
@@ -148,12 +148,12 @@ static int dt_to_map_one_config(struct pinctrl *p, const char *statename,
 			dev_name(pctldev->dev));
 		return -ENODEV;
 	}
-	ret = ops->dt_node_to_map(pctldev, np_config, &map, &num_maps);
+	ret = ops->dt_node_to_map(pctldev, np_config, &map, &num_maps); //调用底层的callback函数处理pin configuration node
 	if (ret < 0)
 		return ret;
 
 	/* Stash the mapping table chunk away for later use */
-	return dt_remember_or_free_map(p, statename, pctldev, map, num_maps);
+	return dt_remember_or_free_map(p, statename, pctldev, map, num_maps);   //将该pin configuration node的mapping entry信息注册到系统中
 }
 
 static int dt_remember_dummy_state(struct pinctrl *p, const char *statename)
@@ -196,7 +196,7 @@ int pinctrl_dt_to_map(struct pinctrl *p)
 	of_node_get(np);
 
 	/* For each defined state ID */
-	for (state = 0; ; state++) {
+	for (state = 0; ; state++) {    //pinctrl-0, pinctrl-1 表示该设备的状态，对应设备树中配置，一般包括default和sleep
 		/* Retrieve the pinctrl-* property */
 		propname = kasprintf(GFP_KERNEL, "pinctrl-%d", state);
 		prop = of_find_property(np, propname, &size);
@@ -204,10 +204,10 @@ int pinctrl_dt_to_map(struct pinctrl *p)
 		if (!prop)
 			break;
 		list = prop->value;
-		size /= sizeof(*list);
+		size /= sizeof(*list);  //保存了phandler的列表和数目
 
 		/* Determine whether pinctrl-names property names the state */
-		ret = of_property_read_string_index(np, "pinctrl-names",
+		ret = of_property_read_string_index(np, "pinctrl-names",    //通过pinctrl-names属性的获得state name
 						    state, &statename);
 		/*
 		 * If not, statename is just the integer state ID. But rather
@@ -220,11 +220,11 @@ int pinctrl_dt_to_map(struct pinctrl *p)
 		}
 
 		/* For every referenced pin configuration node in it */
-		for (config = 0; config < size; config++) {
+		for (config = 0; config < size; config++) {     //遍历pin state中pin configuration list
 			phandle = be32_to_cpup(list++);
 
 			/* Look up the pin configuration node */
-			np_config = of_find_node_by_phandle(phandle);
+			np_config = of_find_node_by_phandle(phandle);   //利用phandle索引，找到pin configuration
 			if (!np_config) {
 				dev_err(p->dev,
 					"prop %s index %i invalid phandle\n",
@@ -234,7 +234,7 @@ int pinctrl_dt_to_map(struct pinctrl *p)
 			}
 
 			/* Parse the node */
-			ret = dt_to_map_one_config(p, statename, np_config);
+			ret = dt_to_map_one_config(p, statename, np_config);    //解析pin configuration
 			of_node_put(np_config);
 			if (ret < 0)
 				goto err;
@@ -242,7 +242,7 @@ int pinctrl_dt_to_map(struct pinctrl *p)
 
 		/* No entries in DT? Generate a dummy state table entry */
 		if (!size) {
-			ret = dt_remember_dummy_state(p, statename);
+			ret = dt_remember_dummy_state(p, statename);    //创建dummy state
 			if (ret < 0)
 				goto err;
 		}

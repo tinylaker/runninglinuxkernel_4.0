@@ -571,8 +571,8 @@ int pinctrl_request_gpio(unsigned gpio)
 	struct pinctrl_gpio_range *range;
 	int ret;
 	int pin;
-
-	ret = pinctrl_get_device_gpio_range(gpio, &pctldev, &range);
+    
+	ret = pinctrl_get_device_gpio_range(gpio, &pctldev, &range); //根据gpio id找到对应的pinctrl_dev & pinctrl_gpio_range   
 	if (ret) {
 		if (pinctrl_ready_for_gpio_range(gpio))
 			ret = 0;
@@ -584,7 +584,7 @@ int pinctrl_request_gpio(unsigned gpio)
 	/* Convert to the pin controllers number space */
 	pin = gpio_to_pin(range, gpio);
 
-	ret = pinmux_request_gpio(pctldev, range, pin, gpio);
+	ret = pinmux_request_gpio(pctldev, range, pin, gpio);   //进行pin复用功能的设定，标记该pin被gpio使用，同时调用底层callback进行寄存器设定
 
 	mutex_unlock(&pctldev->mutex);
 
@@ -823,7 +823,7 @@ static struct pinctrl *create_pinctrl(struct device *dev)
 		if (strcmp(map->dev_name, devname))
 			continue;
 
-		ret = add_setting(p, map);
+		ret = add_setting(p, map);  //分析一个mapping entry, 把这个setting的代码加入到holder中
 		/*
 		 * At this point the adding of a setting may:
 		 *

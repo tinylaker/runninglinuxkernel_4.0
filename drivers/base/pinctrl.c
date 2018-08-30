@@ -23,17 +23,18 @@ int pinctrl_bind_pins(struct device *dev)
 {
 	int ret;
 
-	dev->pins = devm_kzalloc(dev, sizeof(*(dev->pins)), GFP_KERNEL);
+	dev->pins = devm_kzalloc(dev, sizeof(*(dev->pins)), GFP_KERNEL);    //为dev_pin_info结构体申请空间
 	if (!dev->pins)
 		return -ENOMEM;
 
-	dev->pins->p = devm_pinctrl_get(dev);
+	dev->pins->p = devm_pinctrl_get(dev);   //获取pinctrl state holder句柄
 	if (IS_ERR(dev->pins->p)) {
 		dev_dbg(dev, "no pinctrl handle\n");
 		ret = PTR_ERR(dev->pins->p);
 		goto cleanup_alloc;
 	}
 
+    //从pin control state holder中获取default_state、sleep_state、idle_state，存放到该device中    
 	dev->pins->default_state = pinctrl_lookup_state(dev->pins->p,
 					PINCTRL_STATE_DEFAULT);
 	if (IS_ERR(dev->pins->default_state)) {
@@ -42,7 +43,7 @@ int pinctrl_bind_pins(struct device *dev)
 		goto cleanup_get;
 	}
 
-	ret = pinctrl_select_state(dev->pins->p, dev->pins->default_state);
+	ret = pinctrl_select_state(dev->pins->p, dev->pins->default_state); //将该设备pin setting配置为default_state
 	if (ret) {
 		dev_dbg(dev, "failed to activate default pinctrl state\n");
 		goto cleanup_get;

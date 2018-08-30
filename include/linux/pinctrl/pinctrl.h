@@ -60,12 +60,12 @@ struct pinctrl_pin_desc {
 struct pinctrl_gpio_range {
 	struct list_head node;
 	const char *name;
-	unsigned int id;
-	unsigned int base;
-	unsigned int pin_base;
-	unsigned const *pins;
-	unsigned int npins;
-	struct gpio_chip *gc;
+	unsigned int id;    //gpio chip id
+	unsigned int base;  //该range起始的gpio id
+	unsigned int pin_base;  //线性映射下，起始的pin base
+	unsigned const *pins;   //非线性映射，对应gpio lookup table 
+	unsigned int npins; //gpio number 
+	struct gpio_chip *gc;   //range对应的gpio chip
 };
 
 /**
